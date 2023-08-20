@@ -2,11 +2,16 @@
 pragma solidity ^0.8.13;
 
 abstract contract Logger {
-    uint hi = 1000;
+
+    uint public testNum;
 
     constructor() {
-        hi = 2000;
+        testNum = 1000;
     }
 
-    function emitLog() virtual pure public returns (bytes32);
+    function emitLog() public pure virtual returns (bytes32);
+
+    function test() external pure returns (uint) {
+        return 100;
+    }
 }   

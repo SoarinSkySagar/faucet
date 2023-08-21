@@ -3,6 +3,7 @@ import "./App.css";
 import Web3 from "web3";
 import detectEthereumProvider from '@metamask/detect-provider'
 import { loadContract } from "./utils/loadContract.js";
+import { RotatingTriangles } from "react-loader-spinner";
 
 function App() {
   const [web3Api, setWeb3Api] = useState({
@@ -124,7 +125,14 @@ function App() {
           <button disabled={!account} className="button is-link mr-2" onClick={addFunds}>Donate</button>
           <button disabled={!account} className="button is-primary" onClick={withdrawFunds}>Withdraw</button>
         </div>
-        : <span>Looking for Web3...</span>
+        : <RotatingTriangles
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="rotating-triangels-loading"
+        wrapperStyle={{}}
+        wrapperClass="rotating-triangels-wrapper"
+      />
       }
       </div>
     </>

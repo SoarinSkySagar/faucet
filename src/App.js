@@ -21,8 +21,11 @@ function App() {
 
   const reloadEffect = () => setreload(!reload);
 
+  const canConnectContract = account && web3Api.contract;
+
   const setAccountListener = (provider) => {
     provider.on("accountsChanged", (accounts) => {setAccount(accounts[0])});
+    provider.on("chainChanged", _ => window.location.reload());
     provider._jsonRpcConnection.events.on("notification", (payload) => {
       const {method} = payload;
 
@@ -84,16 +87,25 @@ function App() {
     const amount = await window.prompt("How many ETH do you want to donate?");
 
     const { contract, web3 } = web3Api;
-    await contract.addFunds({from: account, value: web3.utils.toWei(amount, "ether")});
-    reloadEffect();
+
+    try {
+      await contract.addFunds({from: account, value: web3.utils.toWei(amount, "ether")});
+      reloadEffect();
+    } catch {
+      window.alert("Transaction request rejected by user!");
+    }
   }
 
   const withdrawFunds = async () => {
     const amount = await window.prompt("How many ETH do you want to withdraw?");
-
     const { contract, web3 } = web3Api;
-    await contract.withdraw(web3.utils.toWei(amount, "ether") , {from: account});
-    reloadEffect();
+
+    try {
+      await contract.withdraw(web3.utils.toWei(amount, "ether") , {from: account});
+      reloadEffect();
+    } catch {
+      window.alert("Transaction request rejected by user!");
+    }
   }
 
   return (
@@ -121,9 +133,15 @@ function App() {
           <div className="balance-view is-size-2 my-4">
             Current Balance: <strong>{(Number(balance)/1000000000000000000).toString()}</strong> ETH
           </div>
+
+          {
+            !canConnectContract && <div className="notification is-warning is-small is-rounded">
+              Please connect your wallet to the correct network.
+            </div>
+          }
           
-          <button disabled={!account} className="button is-link mr-2" onClick={addFunds}>Donate</button>
-          <button disabled={!account} className="button is-primary" onClick={withdrawFunds}>Withdraw</button>
+          <button disabled={!canConnectContract} className="button is-link mr-2" onClick={addFunds}>Donate</button>
+          <button disabled={!canConnectContract} className="button is-primary" onClick={withdrawFunds}>Withdraw</button>
         </div>
         : <RotatingTriangles
         visible={true}

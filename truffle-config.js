@@ -6,6 +6,10 @@ module.exports = {
      port: 7545,
      network_id: "*",
     },
+    sepolia: {
+      host: "https://sepolia.infura.io/v3/",
+      network_id: "11155111",
+    },
   },
   compilers: {
     solc: {

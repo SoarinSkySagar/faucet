@@ -2,8 +2,8 @@
 
 # dependencies
 /node_modules
-!node_modules/web3-errors/lib/esm
-!node_modules/web3-validator/lib/esm
+!/node_modules/web3-errors/lib/esm
+!/node_modules/web3-validator/lib/esm
 /.pnp
 .pnp.js
 

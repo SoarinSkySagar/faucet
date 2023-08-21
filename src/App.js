@@ -158,3 +158,6 @@ function App() {
 }
 
 export default App;
+
+
+// "postinstall": "rm -f ./node_modules/@web3-validator/lib/esm/package.json ./node_modules/@web3-errors/lib/esm/package.json",

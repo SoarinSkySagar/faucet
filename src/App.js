@@ -7,6 +7,7 @@ import { loadContract } from "./utils/loadContract.js";
 function App() {
   const [web3Api, setWeb3Api] = useState({
     provider: null,
+    isProviderLoaded: false,
     web3: null,
     contract: null
   })
@@ -20,24 +21,34 @@ function App() {
   const reloadEffect = () => setreload(!reload);
 
   const setAccountListener = (provider) => {
-    provider.on("accountsChanged", (accounts) => {setAccount(accounts[0])})
+    provider.on("accountsChanged", (accounts) => {setAccount(accounts[0])});
+    provider._jsonRpcConnection.events.on("notification", (payload) => {
+      const {method} = payload;
+
+      if (method === "metamask_unlockStateChanged") {
+        setAccount(null);
+      }
+    })
   }
 
   useEffect(() => {
     const loadProvider = async () => {
       const provider = await detectEthereumProvider();
-      const contract = await loadContract("Faucet", provider);
+      
 
       // debugger
 
       if (provider) {
+        const contract = await loadContract("Faucet", provider);
         setAccountListener(provider);
         setWeb3Api({
           web3: new Web3(provider),
           provider,
-          contract
+          contract,
+          isProviderLoaded: true,
         });
       } else {
+        setWeb3Api({...web3Api, isProviderLoaded: true})
         console.error("Please install Metamask!");
       }
     };
@@ -87,25 +98,34 @@ function App() {
   return (
     <>
       <div className="faucet-wrapper">
+      { web3Api.isProviderLoaded ?
         <div className="faucet">
-        <div className="is-flex is-align-items-center">
+          
+            <div className="is-flex is-align-items-center">
           <span>
             <strong className="mr-2">Account: </strong>
           </span>
           
             {account 
             ? <div>{account}</div>
-            : <button className="button is-small" onClick={() => {web3Api.provider.request({method: "eth_requestAccounts"})}}>
+            : !web3Api.provider ? <>
+              <div className="notification is-warning is-small is-rounded">
+                Wallet not detected, <a target="_blank" href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn">install Metamask</a> now!
+              </div>
+            </> :
+             <button className="button is-small" onClick={() => {web3Api.provider.request({method: "eth_requestAccounts"})}}>
                 Connect Wallet
               </button>}
-          </div>
+            </div> 
           <div className="balance-view is-size-2 my-4">
             Current Balance: <strong>{(Number(balance)/1000000000000000000).toString()}</strong> ETH
           </div>
           
-          <button className="button is-link mr-2" onClick={addFunds}>Donate</button>
-          <button className="button is-primary" onClick={withdrawFunds}>Withdraw</button>
+          <button disabled={!account} className="button is-link mr-2" onClick={addFunds}>Donate</button>
+          <button disabled={!account} className="button is-primary" onClick={withdrawFunds}>Withdraw</button>
         </div>
+        : <span>Looking for Web3...</span>
+      }
       </div>
     </>
   );

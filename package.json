@@ -23,9 +23,7 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject",
-    
-    "postinstall": "rm -f 'node_modules/web3-validator/lib/esm/package.json' && 'node_modules/web3-errors/lib/esm/package.json'"
+    "eject": "react-app-rewired eject"
   },
   "eslintConfig": {
     "extends": [
